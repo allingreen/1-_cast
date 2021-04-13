@@ -1,0 +1,105 @@
+#include <utility>
+#include <vector>
+#include <algorithm>
+#include <string>
+#include <cassert>
+
+/*
+ Задача была бы намного проще, если бы не было альтернатив в обязательных блокирующих курсах.
+ По-хорошему надо спуститься с обязательного 5-лвл курса, теоретически можно соптимизировать, используя знания
+ о 3-х курсах 3лвл, но это не кажется сильно помогающим.
+ Недопилил, потому что долго копался в идее прийти к конфигурации 4-лвла не только с 5-го, но и с 3-го.
+ В силу того, что оптимизируем две величины: сумму приоритетов 2лвл и кол-во курсов схитрить и избежать сумасшедшей
+ рекурсии кажется невозможным...
+*/
+
+int MAX_AMOUNT_OF_COURSES = 100;
+
+class Course {
+public:
+    std::string subject_name;
+    int level;
+    int id;
+    std::vector <std::vector<int>> dependencies; // вектор векторов, а не просто вектор чисел, поскольку есть альтернативные зависимости
+    Course(std::string s_name, int lvl, int id, std::vector<std::vector<int>> dep) :
+    subject_name(std::move(s_name)), level(lvl), id(id), dependencies(std::move(dep)) {}
+};
+
+class CourseHierarchy {
+public:
+    std::vector <Course> courses;
+    int id_to_position_in_vec[100];
+    std::vector <int> level_and_positions_of_courses[5];
+    int id_of_courses_chosen_by_student[4]; // 3 курса 3 лвл и один 5-го лвл
+
+    CourseHierarchy(int num_of_courses) {
+        // чтобы легко по уровню получать позиции курсов
+        for (int i = 0; i < 5; ++i) {
+            std::pair<int, std::vector<int>> empty_column;
+            empty_column.first = i + 1;
+        }
+    }
+
+    void FillDependencies() {}
+
+    void AddCourse(Course new_course) {
+        courses.emplace_back(new_course);
+        id_to_position_in_vec[new_course.id] = courses.size() - 1;
+        level_and_positions_of_courses[new_course.level].push_back(courses.size() - 1);
+    }
+
+    std::vector <int> Recursion(int k, Course& our_course, std::vector <int> configuration) { // выбрать k-ую альтернативу
+        if (k > our_course.dependencies.size()) {
+            assert(k = our_course.dependencies.size());
+            // сейчас имеем конфигурацию курсов 4лвл и хотим понять, какие курсы 3 лвл надо добрать, помимо имеющихся
+            bool pos_of_3lvl_courses[100];
+            for (int t = 0; t < 3; t++) {
+                pos_of_3lvl_courses[id_of_courses_chosen_by_student[t]] = true;
+            } // позиции стопроцентных курсов 3лвла
+
+            for (int j = 0; j < configuration.size(); j++) {
+
+            }
+        } else {
+            // выбираем какую-то альтернативу на k-ом слое и запускаем дальше
+            for (int l = 0; l < our_course.dependencies[k].size(); l++) {
+                configuration.push_back(our_course.dependencies[k][l]);
+                Recursion(k + 1, our_course, configuration);
+            }
+        }
+    }
+
+    // функция получает на вход левел, его конфигурацию, и по ней строит конфигурацию уровня меньше
+    // конфигурация уровня - это вектор позиций взятых на этом лвл-е курсов
+
+    void Rec(int lvl, std::vector <int> configuration) {
+        std::vector <int> next_configuration;
+        for (int q = 0; q < configuration.size(); ++q) {
+            std::vector <int> pos_of_3lvl_potential_course;
+            //Recursion(0, courses[configuration[q]], );
+        }
+    }
+
+    // фукнция получает на вход левел, один курс на этом лвле и строит конфигурацию уровня меньше
+    void BruteForce() {
+        // нужно перебрать все возможные пути развития, начиная с 5-го лвла
+        // у нас есть курс 5-го лвла, который надо закрыть
+
+        int num_of_chosen_courses = 0;
+        std::vector <int> positions_of_picked_courses;
+
+        int id_of_5lvl_course = id_of_courses_chosen_by_student[3];
+        int pos_of_5lvl_course = id_to_position_in_vec[id_of_5lvl_course];
+        Course our_5lvl_course = courses[pos_of_5lvl_course];
+
+        // теперь перебираем курсы 4-го лвла
+        std::vector <int> pos_of_4lvl_potential_courses;
+        std::vector <int> res;
+        // тут запустить рекурсию
+        Recursion(0, our_5lvl_course, pos_of_4lvl_potential_courses);
+    }
+};
+
+int main() {
+    // Каким-то образом подаем данные и на основе этого создаем объект CourseHierarchy
+}
